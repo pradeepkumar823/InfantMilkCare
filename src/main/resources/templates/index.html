@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InfantMilkCare | Precision Healthcare for Infants</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/style.css">
+    <style>
+        .hero {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 4rem 0;
+            gap: 4rem;
+        }
+        .hero-text { flex: 1; }
+        .hero-image { flex: 1; position: relative; }
+        .hero-image img { width: 100%; border-radius: 40px; box-shadow: var(--shadow-hover); }
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 4rem;
+        }
+        .cta-group { display: flex; gap: 1rem; margin-top: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="navbar-wrapper">
+        <nav class="navbar fade-in">
+            <a href="/index" class="logo">
+                <div class="logo-heart"><i class="fas fa-heart"></i></div>
+                InfantMilkCare
+            </a>
+            <div class="nav-links">
+                <a href="/login" class="nav-item">Sign In</a>
+                <a href="/register" class="btn-primary" style="text-decoration: none;">Join for Free</a>
+            </div>
+        </nav>
+    </div>
+
+    <main class="container">
+        <section class="hero fade-in">
+            <div class="hero-text">
+                <span class="badge badge-success" style="margin-bottom: 1rem;">Award Winning Healthcare</span>
+                <h1 style="font-size: 3.5rem; line-height: 1.1; margin-bottom: 1.5rem;">Precision Care for Your Little One.</h1>
+                <p style="font-size: 1.1rem; margin-bottom: 2.5rem;">The world's first AI-driven platform for precision infant nutrition and health monitoring. Based on global BIS standards and pediatric expertise.</p>
+                <div class="cta-group">
+                    <a href="/register" class="btn-primary" style="padding: 16px 32px; font-size: 1.1rem; text-decoration: none;">Start Monitoring</a>
+                    <a href="/login" class="btn-primary" style="background: white; border: 1px solid var(--primary); color: var(--primary); text-decoration: none;">Explore Dashboard</a>
+                </div>
+            </div>
+            <div class="hero-image">
+                <img src="/hero.png" alt="Hero">
+                <div class="glass-card" style="position: absolute; bottom: 30px; left: -20px; padding: 1rem 1.5rem; display: flex; align-items: center; gap: 1rem;">
+                    <div style="width: 40px; height: 40px; background: var(--success); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;"><i class="fas fa-check"></i></div>
+                    <div>
+                        <div style="font-weight: 700;">100% Reliable</div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted);">BIS Compliant Logic</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="feature-grid">
+            <div class="glass-card delay-1" style="text-align: center;">
+                <div style="font-size: 2.5rem; color: var(--primary); margin-bottom: 1rem;"><i class="fas fa-barcode"></i></div>
+                <h3>Smart Scanner</h3>
+                <p>AI-powered barcode scanning to check for allergens and regional compliance instantly.</p>
+            </div>
+            <div class="glass-card delay-2" style="text-align: center;">
+                <div style="font-size: 2.5rem; color: var(--secondary); margin-bottom: 1rem;"><i class="fas fa-chart-line"></i></div>
+                <h3>Precision Health</h3>
+                <p>Monitor HB levels and weight status with logic adapted to local regulatory standards.</p>
+            </div>
+            <div class="glass-card delay-3" style="text-align: center;">
+                <div style="font-size: 2.5rem; color: var(--accent); margin-bottom: 1rem;"><i class="fas fa-bell"></i></div>
+                <h3>Smart Alarms</h3>
+                <p>Predictive feeding schedules that adapt to your child's nutrition intake and age milestones.</p>
+            </div>
+        </section>
+
+        <footer style="margin-top: 5rem; text-align: center; padding-bottom: 3rem;">
+            <p style="font-size: 0.8rem; color: var(--text-muted);">&copy; 2026 InfantMilkCare. All rights reserved. Built for Precision Maternal Health.</p>
+        </footer>
+    </main>
+</body>
+</html>

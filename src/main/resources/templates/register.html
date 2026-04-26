@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register | InfantMilkCare</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/style.css">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+        .register-card {
+            width: 100%;
+            max-width: 450px;
+            padding: 2.5rem 2rem;
+            text-align: center;
+        }
+        .input-group {
+            text-align: left;
+            margin-bottom: 1.2rem;
+        }
+        .input-group label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 0.4rem;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(0,0,0,0.1);
+            background: rgba(255,255,255,0.5);
+            font-family: inherit;
+        }
+    </style>
+</head>
+<body>
+    <div class="glass-card register-card fade-in">
+        <div class="logo" style="justify-content: center; margin-bottom: 1.5rem;">
+            <a href="/index" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;">
+                <div class="logo-heart"><i class="fas fa-heart"></i></div>
+                InfantMilkCare
+            </a>
+        </div>
+        
+        <h2 style="margin-bottom: 0.5rem;">Create Account</h2>
+        <p style="margin-bottom: 1.5rem; font-size: 0.9rem;">Join mama's trusted platform for precision monitoring.</p>
+
+        <form th:action="@{/api/onboarding/register}" method="post">
+            <div class="input-group">
+                <label>Email Address</label>
+                <input type="email" name="email" placeholder="mama@example.com" required>
+            </div>
+            <div class="input-group">
+                <label>Phone Number</label>
+                <input type="tel" name="phoneNumber" placeholder="+1 (555) 000-0000" required>
+            </div>
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" name="password" placeholder="••••••••" required>
+            </div>
+            <div class="input-group">
+                <label>Confirm Password</label>
+                <input type="password" name="confirmPassword" placeholder="••••••••" required>
+            </div>
+            
+            <button type="submit" class="btn-primary" style="width: 100%; margin-top: 1rem;">Continue to Child Details <i class="fas fa-arrow-right" style="margin-left: 8px;"></i></button>
+        </form>
+
+        <p style="margin-top: 1.5rem; font-size: 0.8rem;">Already have an account? <a href="/login" style="color: var(--primary); font-weight: 600; text-decoration: none;">Sign In</a></p>
+    </div>
+</body>
+</html>

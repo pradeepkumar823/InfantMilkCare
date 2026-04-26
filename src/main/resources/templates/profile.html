@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile | InfantMilkCare</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/style.css">
+    <style>
+        /* Inline edit field styles */
+        .field-value { font-weight: 600; font-size: 1rem; }
+        .field-input {
+            display: none;
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            border: 1px solid rgba(0,0,0,0.1);
+            background: rgba(255,255,255,0.7);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+        .editing .field-value { display: none; }
+        .editing .field-input { display: block; }
+
+        .edit-toggle-btn {
+            background: rgba(255,71,133,0.08);
+            color: var(--primary);
+            border: 1px solid rgba(255,71,133,0.2);
+            padding: 8px 18px;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .edit-toggle-btn:hover { background: var(--primary); color: white; }
+
+        .save-cancel-row {
+            display: none;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        .editing .save-cancel-row { display: flex; }
+
+        .alert-banner {
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius-md);
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .alert-success { background: rgba(16,185,129,0.1); color: var(--success); border: 1px solid rgba(16,185,129,0.2); }
+        .alert-error   { background: rgba(239,68,68,0.1);  color: var(--error);   border: 1px solid rgba(239,68,68,0.2); }
+
+        .privacy-toggle-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+        .pill-toggle {
+            width: 44px; height: 24px;
+            border-radius: 100px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            flex-shrink: 0;
+        }
+        .pill-toggle .knob {
+            width: 18px; height: 18px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 3px;
+            transition: left 0.3s ease;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar-wrapper">
+        <nav class="navbar">
+            <a href="/dashboard" class="logo">
+                <div class="logo-heart"><i class="fas fa-heart"></i></div>
+                InfantMilkCare
+            </a>
+            <div class="nav-links">
+                <a href="/dashboard" class="nav-item">Home</a>
+                <a href="/scanner" class="nav-item">Scanner</a>
+                <a href="/history" class="nav-item">History</a>
+                <a href="/alarms" class="nav-item">Alarms</a>
+                <a href="/profile" class="nav-item active">Profile</a>
+            </div>
+
+            <div th:if="${children != null and !children.isEmpty()}" style="margin-right: 15px;">
+                <form th:action="@{/switch-child}" method="post" style="margin: 0;">
+                    <input type="hidden" name="redirectUrl" value="/profile" />
+                    <select name="childId" onchange="this.form.submit()" style="padding: 5px 10px; border-radius: 8px; font-weight: 600; outline: none; border: 1px solid rgba(0,0,0,0.1); font-size: 0.8rem;">
+                        <option th:each="child : ${children}"
+                                th:value="${child.id}"
+                                th:text="${child.name}"
+                                th:selected="${selectedChild != null and child.id == selectedChild.id}">Child</option>
+                    </select>
+                </form>
+            </div>
+            <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--bg-main); color: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 700; box-shadow: var(--shadow-soft); border: 1px solid rgba(255,255,255,0.7);"
+                 th:text="${#strings.substring(userName,0,1).toUpperCase()}">S</div>
+        </nav>
+    </div>
+
+    <main class="container fade-in">
+        <div style="margin-bottom: 2.5rem; display: flex; justify-content: space-between; align-items: center; padding-top: 1rem;">
+            <div>
+                <h1>Profile Settings</h1>
+                <p>Manage your account and your infant's health profile.</p>
+            </div>
+        </div>
+
+        <!-- Flash messages -->
+        <div th:if="${profileSuccess}" class="alert-banner alert-success">
+            <i class="fas fa-check-circle"></i>
+            <span th:text="${profileSuccess}">Success</span>
+        </div>
+        <div th:if="${profileError}" class="alert-banner alert-error">
+            <i class="fas fa-exclamation-circle"></i>
+            <span th:text="${profileError}">Error</span>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 2.5rem; padding-bottom: 3rem;">
+
+            <!-- ── LEFT: Account Card ── -->
+            <div class="glass-card delay-1" style="text-align: center; height: fit-content;">
+                <div style="width: 90px; height: 90px; border-radius: 50%; background: linear-gradient(135deg, rgba(255,71,133,0.15), rgba(107,82,255,0.15)); border: 2px dashed rgba(255,71,133,0.3); margin: 0 auto 1.5rem; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; color: var(--primary);">
+                    <i class="fas fa-user"></i>
+                </div>
+                <h3 style="margin-bottom: 0.3rem;" th:text="${userName}">mama</h3>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.5rem;" th:text="${userName + '@example.com'}">mama@example.com</p>
+
+                <button class="btn-primary" style="width: 100%; margin-bottom: 10px;" onclick="location.href='/child-details'">
+                    <i class="fas fa-plus"></i> Add Another Child
+                </button>
+                <a href="/logout" class="edit-toggle-btn" style="width: 100%; justify-content: center; text-decoration: none; color: var(--error); border-color: rgba(239,68,68,0.2); background: rgba(239,68,68,0.05);">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+
+            <!-- ── RIGHT: Editable sections ── -->
+            <div style="display: flex; flex-direction: column; gap: 2.5rem;">
+
+                <!-- ── MAMA ACCOUNT EDIT ── -->
+                <div class="glass-card delay-2" id="accountCard">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                        <h3 style="margin:0;"><i class="fas fa-shield-halved" style="color: var(--primary);"></i> Account Details</h3>
+                        <button class="edit-toggle-btn" onclick="toggleEdit('accountCard', 'accountForm')">
+                            <i class="fas fa-pen"></i> Edit
+                        </button>
+                    </div>
+
+                    <form id="accountForm" th:action="@{/api/profile/update-user}" method="post">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                            <div class="field-group">
+                                <label style="display: block; font-size: 0.75rem; color: var(--text-muted); font-weight: 700; letter-spacing: 0.05em; margin-bottom: 0.5rem;">EMAIL</label>
+                                <div class="field-value" th:text="${userName + '@example.com'}">mama@example.com</div>
+                            </div>
+                            <div class="field-group">
+                                <label style="display: block; font-size: 0.75rem; color: var(--text-muted); font-weight: 700; letter-spacing: 0.05em; margin-bottom: 0.5rem;">PHONE NUMBER</label>
+                                <div class="field-value" th:text="${currentUser != null and currentUser.phoneNumber != null ? currentUser.phoneNumber : 'Not set'}">Not set</div>
+                                <input class="field-input" type="tel" name="phoneNumber" th:value="${currentUser != null ? currentUser.phoneNumber : ''}" placeholder="+91 99999 00000">
+                            </div>
+                            <div class="field-group">
+                                <label style="display: block; font-size: 0.75rem; color: var(--text-muted); font-weight: 700; letter-spacing: 0.05em; margin-bottom: 0.5rem;">NEW PASSWORD</label>
+                                <div class="field-value">••••••••</div>
+                                <input class="field-input" type="password" name="newPassword" placeholder="Leave blank to keep current">
+                            </div>
+                            <div class="field-group">
+                                <label style="display: block; font-size: 0.75rem; color: var(--text-muted); font-weight: 700; letter-spacing: 0.05em; margin-bottom: 0.5rem;">CONFIRM PASSWORD</label>
+                                <div class="field-value">••••••••</div>
+                                <input class="field-input" type="password" name="confirmPassword" placeholder="Repeat new password">
+                            </div>
+                        </div>
+                        <div class="save-cancel-row">
+                            <button type="submit" class="btn-primary" style="flex: 2;"><i class="fas fa-check"></i> Save Changes</button>
+                            <button type="button" class="edit-toggle-btn" style="flex: 1;" onclick="toggleEdit('accountCard', 'accountForm')"><i class="fas fa-xmark"></i> Cancel</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- ── CHILD PROFILE EDIT ── -->
+                <div class="glass-card delay-3" id="childCard" th:if="${selectedChild != null}">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                        <h3 style="margin:0;">
+                            <i class="fas fa-baby" style="color: var(--secondary);"></i>
+                            <span th:text="${selectedChild.name} + '\'s Profile'">Child Profile</span>
+                        </h3>
+                        <button class="edit-toggle-btn" onclick="toggleEdit('childCard', 'childForm')">
+                            <i class="fas fa-pen"></i> Edit
+                        </button>
+                    </div>
+
+                    <form id="childForm" th:action="@{/api/profile/update-child}" method="post">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1rem;">
+                            <div class="field-group">
+                                <label style="display: block; font-size: 0.75rem; color: var(--text-muted); font-weight: 700; letter-spacing: 0.05em; margin-bottom: 0.5rem;">NAME</label>
+                                <div class="field-value" th:text="${selectedChild.name}">Name</div>
+                                <input class="field-input" type="text" name="name" th:value="${selectedChild.name}" placeholder="Baby Name">
+                            </div>
+                            <div class="field-group">
+                                <label style="display: block; font-size: 0.75rem; color: var(--text-muted); font-weight: 700; letter-spacing: 0.05em; margin-bottom: 0.5rem;">GENDER</label>
+                                <div class="field-value" th:text="${selectedChild.gender}">Female</div>
+                                <select class="field-input" name="gender">
+                                    <option value="Female" th:selected="${selectedChild.gender == 'Female'}">Female</option>
+                                    <option value="Male" th:selected="${selectedChild.gender == 'Male'}">Male</option>
+                                    <option value="Other" th:selected="${selectedChild.gender == 'Other'}">Other</option>
+                                </select>
+                            </div>
+                            <div class="field-group">
+                                <label style="display: block; font-size: 0.75rem; color: var(--text-muted); font-weight: 700; letter-spacing: 0.05em; margin-bottom: 0.5rem;">AGE (MONTHS)</label>
+                                <div class="field-value" th:text="${selectedChild.ageMonths} + ' months'">8 months</div>
+                                <input class="field-input" type="number" name="ageMonths" th:value="${selectedChild.ageMonths}" min="0" max="60">
+                            </div>
+                            <div class="field-group">
+                                <label style="display: block; font-size: 0.75rem; color: var(--text-muted); font-weight: 700; letter-spacing: 0.05em; margin-bottom: 0.5rem;">WEIGHT (KG)</label>
+                                <div class="field-value" th:text="${selectedChild.weightKg} + ' kg'">8.5 kg</div>
+                                <input class="field-input" type="number" step="0.1" name="weightKg" th:value="${selectedChild.weightKg}" min="0">
+                            </div>
+                            <div class="field-group" style="grid-column: span 2;">
+                                <label style="display: block; font-size: 0.75rem; color: var(--text-muted); font-weight: 700; letter-spacing: 0.05em; margin-bottom: 0.5rem;">REGULATORY REGION</label>
+                                <div class="field-value" th:text="${selectedChild.countryRegion}">India (BIS)</div>
+                                <select class="field-input" name="countryRegion">
+                                    <option value="India (BIS IS 14433:2006)" th:selected="${selectedChild.countryRegion == 'India (BIS IS 14433:2006)'}">India (BIS IS 14433:2006)</option>
+                                    <option value="USA (FDA)" th:selected="${selectedChild.countryRegion == 'USA (FDA)'}">USA (FDA)</option>
+                                    <option value="EU (EFSA)" th:selected="${selectedChild.countryRegion == 'EU (EFSA)'}">European Union (EFSA)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <hr style="border: none; border-top: 1px solid rgba(0,0,0,0.05); margin: 0.5rem 0 1rem;">
+
+                        <!-- Privacy toggle -->
+                        <div class="privacy-toggle-row">
+                            <div>
+                                <div style="font-weight: 600; font-size: 0.95rem;">Privacy Shield</div>
+                                <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">Mask sensitive info on dashboard</div>
+                            </div>
+                            <!-- Hidden input to always send a value -->
+                            <input type="hidden" name="privacyShieldEnabled" id="privacyHidden"
+                                   th:value="${selectedChild.privacyShieldEnabled ? 'true' : 'false'}">
+                            <div class="pill-toggle" id="privacyToggle"
+                                 th:style="${selectedChild.privacyShieldEnabled ? 'background: var(--primary);' : 'background: #CBD5E1;'}"
+                                 onclick="togglePrivacy()">
+                                <div class="knob" id="privacyKnob"
+                                     th:style="${selectedChild.privacyShieldEnabled ? 'left: 23px;' : 'left: 3px;'}"></div>
+                            </div>
+                        </div>
+
+                        <div class="save-cancel-row">
+                            <button type="submit" class="btn-primary" style="flex: 2;"><i class="fas fa-check"></i> Save Child Profile</button>
+                            <button type="button" class="edit-toggle-btn" style="flex: 1;" onclick="toggleEdit('childCard', 'childForm')"><i class="fas fa-xmark"></i> Cancel</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Export card -->
+                <div class="glass-card" style="border-left: 4px solid var(--primary);" th:if="${selectedChild != null}">
+                    <h3 style="margin-bottom: 0.5rem;">Export Health Data</h3>
+                    <p style="font-size: 0.9rem; margin-bottom: 1.5rem;"
+                       th:text="'Download a full PDF summary of ' + ${selectedChild.privacyShieldEnabled ? #strings.substring(selectedChild.name,0,1) + '****' : selectedChild.name} + '\'s feeding and health history for pediatrician review.'">
+                        Download a full PDF summary
+                    </p>
+                    <button class="btn-primary"><i class="fas fa-file-pdf"></i> Download PDF Summary</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function toggleEdit(cardId, formId) {
+            const card = document.getElementById(cardId);
+            card.classList.toggle('editing');
+        }
+
+        function togglePrivacy() {
+            const hidden  = document.getElementById('privacyHidden');
+            const toggle  = document.getElementById('privacyToggle');
+            const knob    = document.getElementById('privacyKnob');
+            const isOn    = hidden.value === 'true';
+
+            hidden.value      = isOn ? 'false' : 'true';
+            toggle.style.background = isOn ? '#CBD5E1' : 'var(--primary)';
+            knob.style.left   = isOn ? '3px' : '23px';
+        }
+    </script>
+</body>
+</html>

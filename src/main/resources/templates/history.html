@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Comprehensive History | InfantMilkCare</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <div class="navbar-wrapper">
+    <nav class="navbar">
+      <a href="/index" class="logo">
+        <div class="logo-heart"><i class="fas fa-heart"></i></div>
+        InfantMilkCare
+      </a>
+      <div class="nav-links">
+        <a href="/dashboard" class="nav-item">Home</a>
+        <a href="/scanner" class="nav-item">Scanner</a>
+        <a href="/history" class="nav-item active">History</a>
+        <a href="/alarms" class="nav-item">Alarms</a>
+        <a href="/profile" class="nav-item">Profile</a>
+        <a href="/logout" class="nav-item" style="color: var(--error)"
+          ><i class="fas fa-sign-out-alt"></i> Logout</a
+        >
+      </div>
+
+      <div
+        th:if="${children != null and !children.isEmpty()}"
+        style="margin-right: 15px"
+      >
+        <form th:action="@{/switch-child}" method="post" style="margin: 0">
+          <input type="hidden" name="redirectUrl" value="/history" />
+          <select
+            name="childId"
+            onchange="this.form.submit()"
+            style="
+              padding: 5px 10px;
+              border-radius: 8px;
+              font-weight: 600;
+              outline: none;
+              border: 1px solid rgba(0, 0, 0, 0.1);
+              font-size: 0.8rem;
+            "
+          >
+            <option
+              th:each="child : ${children}"
+              th:value="${child.id}"
+              th:text="${child.name}"
+              th:selected="${selectedChild != null and child.id == selectedChild.id}"
+            >
+              Child
+            </option>
+          </select>
+        </form>
+      </div>
+      <div class="user-profile">
+        <div
+          style="
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--bg-main); color: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 700; box-shadow: var(--shadow-soft); border: 1px solid rgba(255,255,255,0.7);
+          "
+          th:text="${#strings.substring(userName,0,1).toUpperCase()}"
+        >
+          S
+        </div>
+      </div>
+    </nav>
+    </div>
+
+    <main class="container fade-in">
+      <div
+        style="
+          margin-bottom: 3rem;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        "
+      >
+        <div>
+          <h1>Master Data History</h1>
+          <p>Comprehensive overview of all data recorded for your child.</p>
+        </div>
+      </div>
+
+      <div
+        th:if="${selectedChild == null}"
+        class="glass-card"
+        style="margin-bottom: 2rem; background: var(--error); color: white"
+      >
+        Please select a child or add a child profile first.
+      </div>
+
+      <div th:if="${selectedChild != null}">
+        <!-- Section 1: Child Profile Info -->
+        <div class="glass-card delay-1" style="margin-bottom: 2.5rem">
+          <h3 style="margin-bottom: 1.5rem">
+            <i class="fas fa-id-card" style="color: var(--primary)"></i> Infant Profile
+          </h3>
+          <div
+            style="
+              display: grid;
+              grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+              gap: 2rem;
+            "
+          >
+            <div>
+              <label style="font-size: 0.8rem; color: var(--text-muted)"
+                >NAME</label
+              >
+              <div
+                style="font-weight: 600; font-size: 1.2rem"
+                th:text="${selectedChild.privacyShieldEnabled ? #strings.substring(selectedChild.name,0,1) + '****' : selectedChild.name}"
+              >
+                Name
+              </div>
+            </div>
+            <div>
+              <label style="font-size: 0.8rem; color: var(--text-muted)"
+                >AGE (MONTHS)</label
+              >
+              <div
+                style="font-weight: 600; font-size: 1.2rem"
+                th:text="${selectedChild.ageMonths}"
+              >
+                0
+              </div>
+            </div>
+            <div>
+              <label style="font-size: 0.8rem; color: var(--text-muted)"
+                >LATEST WEIGHT</label
+              >
+              <div style="font-weight: 600; font-size: 1.2rem">
+                <span
+                  th:text="${selectedChild.weightKg != null ? selectedChild.weightKg : '--'}"
+                ></span>
+                kg
+              </div>
+            </div>
+            <div>
+              <label style="font-size: 0.8rem; color: var(--text-muted)"
+                >REGION</label
+              >
+              <div
+                style="font-weight: 600; font-size: 1.2rem"
+                th:text="${selectedChild.countryRegion}"
+              >
+                Region
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 2.5rem; padding-bottom: 3rem;">
+          <!-- Section 2: Health Records -->
+          <div class="glass-card delay-2">
+            <h3 style="margin-bottom: 1.5rem">
+              <i class="fas fa-heartbeat" style="color: var(--secondary)"></i>
+              Health Records History
+            </h3>
+            <div>
+              <div
+                th:if="${#lists.isEmpty(healthRecords)}"
+                style="color: var(--text-muted)"
+              >
+                No health records found.
+              </div>
+              <div
+                th:each="record : ${healthRecords}"
+                style="
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                  padding: 1rem 0;
+                  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+                "
+              >
+                <div>
+                  <div style="font-weight: 600">
+                    HB: <span th:text="${record.hemoglobinLevel}"></span> g/dL |
+                    Weight:
+                    <span
+                      th:text="${record.weightKg != null ? record.weightKg + ' kg' : 'N/A'}"
+                    ></span>
+                  </div>
+                  <div
+                    style="font-size: 0.8rem; color: var(--text-muted)"
+                    th:text="${#temporals.format(record.recordedAt, 'MMM dd, yyyy HH:mm')}"
+                  >
+                    Date
+                  </div>
+                </div>
+                <div>
+                  <span
+                    th:class="'badge badge-' + (${record.hemoglobinStatus == 'HEALTHY'} ? 'success' : 'error')"
+                    th:text="${record.hemoglobinStatus}"
+                    >STATUS</span
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 3: Feeding History -->
+          <div class="glass-card delay-3">
+            <h3 style="margin-bottom: 1.5rem">
+              <i class="fas fa-bottle-baby" style="color: var(--accent)"></i>
+              Feeding Logs
+            </h3>
+            <div>
+              <div
+                th:if="${#lists.isEmpty(feedingLogs)}"
+                style="color: var(--text-muted)"
+              >
+                No feeding logs found.
+              </div>
+              <div
+                th:each="log : ${feedingLogs}"
+                style="
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: flex-start;
+                  padding: 1rem 0;
+                  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+                "
+              >
+                <div>
+                  <div
+                    style="font-weight: 600"
+                    th:text="${log.amountMl} + ' ml - ' + ${log.type}"
+                  >
+                    Amount
+                  </div>
+                  <div
+                    style="font-size: 0.8rem; color: var(--text-muted)"
+                    th:text="${#temporals.format(log.timestamp, 'MMM dd, HH:mm')}"
+                  >
+                    Time
+                  </div>
+                  <div
+                    th:if="${log.note != null and !log.note.isEmpty()}"
+                    style="font-size: 0.85rem; margin-top: 5px; color: #555"
+                    th:text="${log.note}"
+                  >
+                    Notes
+                  </div>
+                </div>
+                <form
+                  th:action="@{'/api/feeding/logs/' + ${log.id} + '/delete'}"
+                  method="post"
+                >
+                  <button
+                    type="submit"
+                    style="
+                      background: none;
+                      border: none;
+                      color: var(--error);
+                      cursor: pointer;
+                    "
+                  >
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

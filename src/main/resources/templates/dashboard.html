@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | InfantMilkCare</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div class="navbar-wrapper">
+        <nav class="navbar">
+            <a href="/dashboard" class="logo">
+                <div class="logo-heart"><i class="fas fa-heart"></i></div>
+                InfantMilkCare
+            </a>
+        <div class="nav-links">
+            <a href="/dashboard" class="nav-item active">Home</a>
+            <a th:href="@{/scanner}" class="nav-item">Scanner</a>
+            <a th:href="@{/history}" class="nav-item">History</a>
+            <a th:href="@{/alarms}" class="nav-item">Alarms</a>
+            <a th:href="@{/profile}" class="nav-item">Profile</a>
+            <a href="/logout" class="nav-item" style="color: var(--error);"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
+        
+        <div th:if="${children != null and !children.isEmpty()}" style="margin-right: 15px;">
+            <form th:action="@{/switch-child}" method="post" style="margin: 0;">
+                <input type="hidden" name="redirectUrl" value="/dashboard" />
+                <select name="childId" onchange="this.form.submit()" style="padding: 5px 10px; border-radius: 8px; font-weight: 600; outline: none; border: 1px solid rgba(0,0,0,0.1); font-size: 0.8rem;">
+                    <option th:each="child : ${children}" 
+                            th:value="${child.id}" 
+                            th:text="${child.name}"
+                            th:selected="${selectedChild != null and child.id == selectedChild.id}">Child</option>
+                </select>
+            </form>
+        </div>
+        <div class="user-profile">
+            <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--bg-main); color: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 700; box-shadow: var(--shadow-soft); border: 1px solid rgba(255,255,255,0.7);" th:text="${#strings.substring(userName,0,1).toUpperCase()}">U</div>
+        </div>
+        </nav>
+    </div>
+
+    <main class="container fade-in">
+        <div style="margin-bottom: 2.5rem; display: flex; justify-content: space-between; align-items: center; padding-top: 1rem;">
+            <div>
+                <h1>Hello, Mama! <span style="font-size: 1.2rem; color: var(--success);"><i class="fas fa-check-circle"></i></span></h1>
+                <p>Welcome to your precision health dashboard.</p>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; margin-bottom: 2.5rem;">
+            <div class="glass-card delay-1">
+                <h3 style="margin-bottom: 1.5rem;"><i class="fas fa-plus-circle" style="color: var(--primary);"></i> Log a New Feed</h3>
+                <form th:action="@{/api/feeding/logs}" method="post" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; align-items: flex-end;">
+                    <div>
+                        <label style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 4px;">AMOUNT (ML)</label>
+                        <input type="number" name="amountMl" placeholder="e.g. 150" required style="width: 100%; padding: 10px; border-radius: 12px; border: 1px solid #ddd;">
+                    </div>
+                    <div>
+                        <label style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 4px;">TYPE</label>
+                        <select name="type" style="width: 100%; padding: 10px; border-radius: 12px; border: 1px solid #ddd;">
+                            <option value="Formula">Formula</option>
+                            <option value="Breast Milk">Breast Milk</option>
+                            <option value="Water">Water</option>
+                        </select>
+                    </div>
+                    <div style="grid-column: span 2;">
+                        <label style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 4px;">NOTES</label>
+                        <input type="text" name="note" placeholder="Any notes?" style="width: 100%; padding: 10px; border-radius: 12px; border: 1px solid #ddd;">
+                    </div>
+                    <button type="submit" class="btn-primary" style="grid-column: span 2;">LOG FEED</button>
+                </form>
+            </div>
+
+            <div class="glass-card delay-2">
+                <h3 style="margin-bottom: 1.5rem;"><i class="fas fa-stethoscope" style="color: var(--secondary);"></i> Record Health Stats</h3>
+                <form th:action="@{/api/health/record}" method="post" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; align-items: flex-end;">
+                    <div>
+                        <label style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 4px;">HB LEVEL (g/dL)</label>
+                        <input type="number" step="0.1" name="hemoglobinLevel" placeholder="e.g. 11.5" required style="width: 100%; padding: 10px; border-radius: 12px; border: 1px solid #ddd;">
+                    </div>
+                    <div>
+                        <label style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 4px;">WEIGHT (kg)</label>
+                        <input type="number" step="0.1" name="weightKg" placeholder="e.g. 8.5" style="width: 100%; padding: 10px; border-radius: 12px; border: 1px solid #ddd;">
+                    </div>
+                    <button type="submit" class="btn-primary" style="background: var(--secondary); grid-column: span 2;">RECORD STATS</button>
+                </form>
+            </div>
+        </div>
+
+        <div th:if="${selectedChild != null}" class="glass-card delay-3" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; background: linear-gradient(135deg, rgba(255,255,255,0.8), rgba(255,255,255,0.4));">
+            <div>
+                <h4 style="color: var(--primary); margin-bottom: 0.5rem; text-transform: uppercase; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.05em;">Active Monitoring</h4>
+                <h2 style="margin-bottom: 1.5rem;" th:text="${selectedChild.privacyShieldEnabled ? #strings.substring(selectedChild.name,0,1) + '****' : selectedChild.name} + '\'s Current Status'">Current Status</h2>
+                <div style="display: flex; gap: 1rem;">
+                    <button class="btn-primary" onclick="location.href='/scanner'"><i class="fas fa-barcode"></i> Scan Product</button>
+                    <button class="btn-primary" style="background: linear-gradient(135deg, var(--secondary), var(--secondary-light)); box-shadow: 0 10px 40px -10px rgba(107, 82, 255, 0.4);" onclick="location.href='/alarms'"><i class="fas fa-clock"></i> Set Alarm</button>
+                </div>
+            </div>
+            <img src="/hero.png" alt="Hero" style="width: 250px; border-radius: var(--radius-lg); box-shadow: var(--shadow-card); transform: rotate(2deg); transition: transform 0.3s ease;" onmouseover="this.style.transform='rotate(0deg) scale(1.05)'" onmouseout="this.style.transform='rotate(2deg) scale(1)'">
+        </div>
+
+        <div th:if="${selectedChild != null}" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2.5rem; padding-bottom: 3rem;">
+            <div class="glass-card delay-1">
+                <div style="color: var(--primary); font-weight: 700; font-size: 0.85rem; letter-spacing: 0.05em; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 8px;"><i class="fas fa-droplet"></i> HB LEVEL</div>
+                <h2>
+                    <span th:text="${latestRecord != null ? latestRecord.hemoglobinLevel : '--'}">--</span> 
+                    <span style="font-size: 0.9rem; font-weight: 400;">g/dL</span>
+                </h2>
+                <span th:if="${latestRecord != null}" th:class="'badge badge-' + (${latestRecord.hemoglobinStatus == 'HEALTHY'} ? 'success' : 'error')" th:text="${latestRecord.hemoglobinStatus}">STATUS</span>
+                <span th:if="${latestRecord == null}" class="badge" style="background: var(--text-muted); color: white;">NO DATA</span>
+            </div>
+            
+            <div class="glass-card delay-2">
+                <div style="color: var(--secondary); font-weight: 700; font-size: 0.85rem; letter-spacing: 0.05em; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 8px;"><i class="fas fa-weight-scale"></i> WEIGHT</div>
+                <h2>
+                    <span th:text="${selectedChild.weightKg != null ? selectedChild.weightKg : '--'}">--</span> 
+                    <span style="font-size: 0.9rem; font-weight: 400;">kg</span>
+                </h2>
+                <span th:class="'badge badge-' + (${weightStatus == 'OPTIMAL'} ? 'success' : 'error')" th:text="${weightStatus}">STATUS</span>
+            </div>
+            
+            <div class="glass-card delay-3">
+                <div style="color: var(--accent); font-weight: 700; font-size: 0.85rem; letter-spacing: 0.05em; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 8px;"><i class="fas fa-calendar-check"></i> AGE</div>
+                <h2><span th:text="${selectedChild.ageMonths}">--</span> <span style="font-size: 0.9rem; font-weight: 400;">months</span></h2>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

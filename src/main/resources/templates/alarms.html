@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alarms | InfantMilkCare</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div class="navbar-wrapper">
+        <nav class="navbar">
+            <a href="/dashboard" class="logo">
+                <div class="logo-heart"><i class="fas fa-heart"></i></div>
+                InfantMilkCare
+            </a>
+        <div class="nav-links">
+            <a href="/dashboard" class="nav-item">Home</a>
+            <a href="/scanner" class="nav-item">Scanner</a>
+            <a href="/history" class="nav-item">History</a>
+            <a href="/alarms" class="nav-item active">Alarms</a>
+            <a href="/profile" class="nav-item">Profile</a>
+        </div>
+        
+        <div th:if="${children != null and !children.isEmpty()}" style="margin-right: 15px;">
+            <form th:action="@{/switch-child}" method="post" style="margin: 0;">
+                <input type="hidden" name="redirectUrl" value="/alarms" />
+                <select name="childId" onchange="this.form.submit()" style="padding: 5px 10px; border-radius: 8px; font-weight: 600; outline: none; border: 1px solid rgba(0,0,0,0.1); font-size: 0.8rem;">
+                    <option th:each="child : ${children}" 
+                            th:value="${child.id}" 
+                            th:text="${child.name}"
+                            th:selected="${selectedChild != null and child.id == selectedChild.id}">Child</option>
+                </select>
+            </form>
+        </div>
+        <div class="user-profile">
+            <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--bg-main); color: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 700; box-shadow: var(--shadow-soft); border: 1px solid rgba(255,255,255,0.7);" th:text="${#strings.substring(userName,0,1).toUpperCase()}">S</div>
+        </div>
+        </nav>
+    </div>
+
+    <main class="container fade-in">
+        <div style="margin-bottom: 2.5rem; display: flex; justify-content: space-between; align-items: center; padding-top: 1rem;">
+            <div>
+                <h1>Feeding Alarms</h1>
+                <p th:if="${selectedChild != null}" th:text="'Manage precise feeding schedules for ' + ${selectedChild.name} + '.'">Manage precise feeding schedules.</p>
+                <p th:if="${selectedChild == null}">Manage precise feeding schedules.</p>
+            </div>
+            <div style="width: 50px; height: 50px; background: rgba(255,107,157,0.1); color: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;"><i class="fas fa-stopwatch"></i></div>
+        </div>
+
+        <div th:if="${selectedChild == null}" class="glass-card delay-1" style="margin-bottom: 2rem; background: var(--error); color: white;">
+            Please select a child or add a child profile first.
+        </div>
+
+        <div th:if="${selectedChild != null}" class="glass-card delay-1" style="margin-bottom: 3rem;">
+            <h3 style="margin-bottom: 1.5rem;">Add New Alert</h3>
+            <form th:action="@{/api/feeding/alarms}" method="post">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+                    <div>
+                        <label style="display: block; font-size: 0.8rem; margin-bottom: 0.5rem; color: var(--text-muted);">Time</label>
+                        <input type="time" name="alarmTime" required style="width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #ddd; font-family: inherit;">
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.8rem; margin-bottom: 0.5rem; color: var(--text-muted);">Label</label>
+                        <input type="text" name="label" placeholder="e.g. Afternoon Feed" required style="width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #ddd; font-family: inherit;">
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary" style="width: 100%;"><i class="fas fa-plus"></i> Add Alarm</button>
+            </form>
+        </div>
+
+        <div th:if="${selectedChild != null}">
+            <h3 style="margin-bottom: 1rem;">Active Alarms</h3>
+            <div th:if="${alarmsList == null or #lists.isEmpty(alarmsList)}" class="glass-card delay-2" style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                <i class="fas fa-bell-slash" style="font-size: 2.5rem; margin-bottom: 1rem; opacity: 0.4; display: block;"></i>
+                <p style="font-size: 1rem;">No alarms scheduled yet. Add one above!</p>
+            </div>
+            <div th:if="${alarmsList != null and !#lists.isEmpty(alarmsList)}" style="display: flex; flex-direction: column; gap: 1rem;">
+                <div th:each="alarm : ${alarmsList}" class="glass-card delay-2" style="display: flex; justify-content: space-between; align-items: center; padding: 1.5rem;">
+                    <div>
+                        <h2 style="margin: 0; color: var(--primary);" th:text="${#temporals.format(alarm.alarmTime, 'HH:mm')}">14:00</h2>
+                        <div style="color: var(--text-muted); font-size: 0.9rem; margin-top: 5px;" th:text="${alarm.label}">Label</div>
+                    </div>
+                    <form th:action="@{'/api/feeding/alarms/' + ${alarm.id} + '/delete'}" method="post">
+                        <button type="submit" style="background: none; border: none; color: var(--error); cursor: pointer; font-size: 1.2rem; padding: 8px 12px; border-radius: 8px; transition: background 0.2s;" onmouseover="this.style.background='rgba(239,68,68,0.08)'" onmouseout="this.style.background='none'">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

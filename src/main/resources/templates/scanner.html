@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scanner | InfantMilkCare</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div class="navbar-wrapper">
+        <nav class="navbar">
+            <a href="/dashboard" class="logo">
+                <div class="logo-heart"><i class="fas fa-heart"></i></div>
+                InfantMilkCare
+            </a>
+        <div class="nav-links">
+            <a href="/dashboard" class="nav-item">Home</a>
+            <a href="/scanner" class="nav-item active">Scanner</a>
+            <a href="/history" class="nav-item">History</a>
+            <a href="/alarms" class="nav-item">Alarms</a>
+            <a href="/profile" class="nav-item">Profile</a>
+        </div>
+        
+        <div th:if="${children != null and !children.isEmpty()}" style="margin-right: 15px;">
+            <form th:action="@{/switch-child}" method="post" style="margin: 0;">
+                <input type="hidden" name="redirectUrl" value="/scanner" />
+                <select name="childId" onchange="this.form.submit()" style="padding: 5px 10px; border-radius: 8px; font-weight: 600; outline: none; border: 1px solid rgba(0,0,0,0.1); font-size: 0.8rem;">
+                    <option th:each="child : ${children}" 
+                            th:value="${child.id}" 
+                            th:text="${child.name}"
+                            th:selected="${selectedChild != null and child.id == selectedChild.id}">Child</option>
+                </select>
+            </form>
+        </div>
+        <div class="user-profile">
+            <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--bg-main); color: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 700; box-shadow: var(--shadow-soft); border: 1px solid rgba(255,255,255,0.7);" th:text="${#strings.substring(userName,0,1).toUpperCase()}">S</div>
+        </div>
+        </nav>
+    </div>
+
+    <main class="container fade-in">
+        <div style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h1>Product Scanner</h1>
+                <p>Scan your infant's milk or supplements to check BIS compliance and nutrition.</p>
+            </div>
+        </div>
+        
+        <div th:if="${selectedChild == null}" class="glass-card delay-1" style="margin-bottom: 2.5rem; background: var(--error); color: white;">
+            Please select a child or add a child profile first to personalize scanner logic.
+        </div>
+
+        <div th:if="${selectedChild != null}" class="glass-card delay-1" style="text-align: center; padding: 4rem 2rem; border: 2px dashed rgba(255, 71, 133, 0.4);">
+            <div style="font-size: 4rem; color: var(--primary); margin-bottom: 2rem; animation: pulse 2s infinite;"><i class="fas fa-qrcode"></i></div>
+            <h2 style="margin-bottom: 1rem;">Ready to Scan</h2>
+            <p style="margin-bottom: 2.5rem;" th:text="'Analyzing for ' + ${selectedChild.name} + ' (' + ${selectedChild.ageMonths} + 'mo, ' + ${selectedChild.countryRegion} + ')'">Place the barcode or nutritional label within the camera view.</p>
+            
+            <form th:action="@{/scanner/scan}" method="post">
+                <button type="submit" class="btn-primary"><i class="fas fa-camera"></i> Start Camera / Simulate Scan</button>
+            </form>
+        </div>
+
+        <!-- Render the result if it was generated -->
+        <div th:if="${scanResult != null}" style="margin-top: 2rem;">
+            <div class="glass-card fade-in" th:style="${scanResult.safe ? 'border-left: 4px solid var(--success);' : 'border-left: 4px solid var(--error);'}">
+                <h3 th:style="${scanResult.safe ? 'color: var(--success); display: flex; align-items: center; gap: 10px;' : 'color: var(--error); display: flex; align-items: center; gap: 10px;'}">
+                    <i th:class="${scanResult.safe ? 'fas fa-check-circle' : 'fas fa-exclamation-triangle'}"></i> 
+                    <span th:text="${scanResult.title}">Result</span>
+                </h3>
+                <p style="margin-top: 10px;" th:text="${scanResult.message}">Message details</p>
+                <!-- Close Button to clear view: it just goes back to /scanner -->
+                <form th:action="@{/scanner}" method="get" style="margin-top: 15px;">
+                    <button type="submit" class="btn-primary" style="background: var(--text-muted); padding: 8px 16px; font-size: 0.9rem;">Close</button>
+                </form>
+            </div>
+        </div>
+
+        <div style="margin-top: 3rem; padding-bottom: 3rem;">
+            <h3>Recent Scans</h3>
+            <div class="glass-card delay-2" style="margin-top: 1.5rem; padding: 1.5rem; display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <div style="width: 40px; height: 40px; background: rgba(0,184,148,0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--success);"><i class="fas fa-check"></i></div>
+                    <div>
+                        <div style="font-weight: 600;">Infant Formula Type A</div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted);">BIS IS 14433 Compliant</div>
+                    </div>
+                </div>
+                <div class="badge badge-success">Safe</div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

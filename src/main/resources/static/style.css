@@ -1,0 +1,256 @@
+/* GLOBAL DESIGN SYSTEM - InfantMilkCare Premium */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Outfit:wght@300;400;600;700;800&display=swap');
+
+:root {
+    /* Colors */
+    --primary: #FF4785;
+    --primary-light: #FF85B3;
+    --primary-dark: #D42663;
+    --secondary: #6B52FF;
+    --secondary-light: #9B8CFF;
+    --accent: #FFC043;
+    
+    --bg-main: #f8f9fc;
+    --card-bg: rgba(255, 255, 255, 0.65);
+    --text-main: #1A1F36;
+    --text-muted: #64748B;
+    
+    --success: #10B981;
+    --warning: #F59E0B;
+    --error: #EF4444;
+    
+    /* Effects & Radii */
+    --glass: rgba(255, 255, 255, 0.7);
+    --blur: blur(20px);
+    
+    --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    --shadow-glow: 0 10px 40px -10px rgba(255, 71, 133, 0.25);
+    --shadow-card: 0 20px 40px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02);
+    --shadow-hover: 0 25px 50px -12px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255,255,255,0.7) inset;
+    
+    --radius-sm: 12px;
+    --radius-md: 20px;
+    --radius-lg: 32px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    color: var(--text-main);
+    min-height: 100vh;
+    background-color: var(--bg-main);
+    /* Animated mesh gradient blob simulation */
+    background-image: 
+        radial-gradient(at 0% 0%, hsla(339,100%,85%,0.6) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, hsla(249,100%,88%,0.6) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, hsla(340,100%,85%,0.4) 0px, transparent 50%),
+        radial-gradient(at 0% 100%, hsla(250,100%,88%,0.4) 0px, transparent 50%);
+    background-attachment: fixed;
+    line-height: 1.5;
+}
+
+h1, h2, h3, h4, h5, h6, .outfit {
+    font-family: 'Outfit', sans-serif;
+    letter-spacing: -0.02em;
+    color: var(--text-main);
+}
+
+h1 { font-weight: 800; font-size: 2.5rem; letter-spacing: -0.03em; }
+h2 { font-weight: 700; font-size: 1.75rem; }
+h3 { font-weight: 600; font-size: 1.25rem; }
+
+/* Custom Inputs */
+input, select, textarea {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    transition: all 0.3s ease;
+}
+
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 4px rgba(255, 71, 133, 0.1) !important;
+    background: rgba(255, 255, 255, 0.95) !important;
+}
+
+/* Layout */
+.container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2rem;
+    position: relative;
+    z-index: 1;
+}
+
+/* Floating Pill Navbar */
+.navbar-wrapper {
+    padding: 1.5rem 2rem 0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1.5rem;
+    background: var(--glass);
+    backdrop-filter: var(--blur);
+    -webkit-backdrop-filter: var(--blur);
+    border: 1px solid rgba(255,255,255,0.8);
+    border-radius: 100px;
+    box-shadow: var(--shadow-card);
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 800;
+    font-size: 1.25rem;
+    color: var(--text-main);
+    text-decoration: none;
+    font-family: 'Outfit', sans-serif;
+}
+
+.logo-heart {
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.85rem;
+    box-shadow: 0 2px 10px rgba(255,71,133,0.3);
+}
+
+.nav-links {
+    display: flex;
+    gap: 0.5rem;
+    background: rgba(255,255,255,0.4);
+    padding: 0.3rem;
+    border-radius: 100px;
+}
+
+.nav-item {
+    text-decoration: none;
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 0.5rem 1.2rem;
+    border-radius: 100px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nav-item:hover { 
+    color: var(--text-main); 
+    background: rgba(255,255,255,0.6);
+}
+
+.nav-item.active { 
+    color: var(--primary); 
+    background: white;
+    box-shadow: var(--shadow-soft);
+}
+
+/* Glassmorphism Cards 2.0 */
+.glass-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    border-top: 1px solid rgba(255,255,255,1);
+    border-left: 1px solid rgba(255,255,255,1);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    padding: 2.5rem;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.glass-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none;
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(255,255,255,0.5);
+    background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 100%);
+    opacity: 0.5;
+}
+
+.glass-card:hover {
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-5px) scale(1.01);
+}
+
+/* UI Elements */
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    border: none;
+    padding: 12px 28px;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    cursor: pointer;
+    box-shadow: var(--shadow-glow);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px -10px rgba(255, 71, 133, 0.4);
+    filter: brightness(110%);
+}
+
+.btn-primary:active {
+    transform: translateY(1px) scale(0.96);
+}
+
+.badge {
+    padding: 6px 14px;
+    border-radius: 100px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.badge-success { background: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.2); }
+.badge-warning { background: rgba(245, 158, 11, 0.1); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.2); }
+.badge-error   { background: rgba(239, 68, 68, 0.1); color: var(--error); border: 1px solid rgba(239, 68, 68, 0.2); }
+
+/* Animation Utils */
+.fade-in { animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+.delay-1 { animation-delay: 0.1s; }
+.delay-2 { animation-delay: 0.2s; }
+.delay-3 { animation-delay: 0.3s; }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); filter: blur(5px); }
+    to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: rgba(0,0,0,0.02); }
+::-webkit-scrollbar-thumb { background: rgba(255,71,133,0.3); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,71,133,0.6); }

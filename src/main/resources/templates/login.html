@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | InfantMilkCare</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/style.css">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+        .login-card {
+            width: 100%;
+            max-width: 400px;
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+        .input-group {
+            text-align: left;
+            margin-bottom: 1.5rem;
+        }
+        .input-group label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 14px;
+            border-radius: 14px;
+            border: 1px solid rgba(0,0,0,0.1);
+            background: rgba(255,255,255,0.5);
+            font-family: inherit;
+        }
+    </style>
+</head>
+<body>
+    <div class="glass-card login-card fade-in">
+        <div class="logo" style="justify-content: center; margin-bottom: 2rem;">
+            <a href="/index" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;">
+                <div class="logo-heart"><i class="fas fa-heart"></i></div>
+                InfantMilkCare
+            </a>
+        </div>
+        
+        <h2 style="margin-bottom: 0.5rem;">Welcome</h2>
+        <p style="margin-bottom: 2rem; font-size: 0.9rem;">Create your secure account to start precision monitoring.</p>
+
+        <form action="/login" method="POST">
+            <div class="input-group">
+                <label>Email or Phone</label>
+                <input type="text" name="username" placeholder="mama@example.com" required>
+            </div>
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" name="password" placeholder="••••••••" required>
+            </div>
+            
+            <button type="submit" class="btn-primary" style="width: 100%; margin-top: 1rem;">Get Started <i class="fas fa-arrow-right" style="margin-left: 8px;"></i></button>
+        </form>
+
+        <p style="margin-top: 1.5rem; font-size: 0.8rem;">Forgot password? <a href="#" style="color: var(--primary); font-weight: 600; text-decoration: none;">Reset here</a></p>
+        <p style="margin-top: 0.8rem; font-size: 0.8rem;">Don't have an account? <a href="/register" style="color: var(--secondary); font-weight: 600; text-decoration: none;">Sign Up</a></p>
+        
+    </div>
+</body>
+</html>

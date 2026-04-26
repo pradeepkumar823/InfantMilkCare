@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Child Details | InfantMilkCare</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/style.css">
+    <style>
+        body { display: flex; align-items: center; justify-content: center; padding: 0; }
+        .details-card { width: 100%; max-width: 500px; padding: 2rem; }
+        .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.2rem; }
+        .input-group { text-align: left; }
+        .input-group label { display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.4rem; }
+        .input-group input, .input-group select { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.1); background: rgba(255,255,255,0.5); font-family: inherit; }
+    </style>
+</head>
+<body>
+    <div class="glass-card details-card fade-in">
+        <h2 style="margin-bottom: 0.5rem; text-align: center;">Child Details</h2>
+        <p style="margin-bottom: 2rem; font-size: 0.9rem; text-align: center;">Tell us about your little one to personalize monitoring.</p>
+
+        <form th:action="@{/api/onboarding/child-details}" method="POST">
+            <div class="input-group" style="margin-bottom: 1.2rem;">
+                <label>Country / Regulatory Region</label>
+                <select name="countryRegion" required>
+                    <option value="India (BIS IS 14433:2006)">India (BIS IS 14433:2006)</option>
+                    <option value="USA (FDA)">USA (FDA)</option>
+                    <option value="EU (EFSA)">European Union (EFSA)</option>
+                </select>
+            </div>
+
+            <div class="input-row">
+                <div class="input-group">
+                    <label>Child Name</label>
+                    <input type="text" name="name" placeholder="Baby Name" required>
+                </div>
+                <div class="input-group">
+                    <label>Age (Months)</label>
+                    <input type="number" name="ageMonths" placeholder="e.g. 8" required>
+                </div>
+            </div>
+
+            <div class="input-row">
+                <div class="input-group">
+                    <label>Weight (kg)</label>
+                    <input type="number" step="0.1" name="weightKg" placeholder="e.g. 8.5" required>
+                </div>
+                <div class="input-group">
+                    <label>Gender</label>
+                    <select name="gender" required>
+                        <option value="Female">Female</option>
+                        <option value="Male">Male</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; margin-bottom: 2rem;">
+                <div>
+                    <div style="font-weight: 600; font-size: 0.9rem;">Privacy Shield</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">Mask sensitive info on dashboard</div>
+                </div>
+                <!-- Adding value="true" helps parameter parsing -->
+                <input type="checkbox" name="privacy" value="true" checked>
+            </div>
+            
+            <div style="display: flex; gap: 1rem;">
+                <button type="button" class="btn-primary" style="background: var(--text-muted); flex: 1;" onclick="history.back()">Back</button>
+                <button type="submit" class="btn-primary" style="flex: 2;">Continue</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
