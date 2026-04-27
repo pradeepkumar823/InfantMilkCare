@@ -8,7 +8,7 @@
 
 [![Java](https://img.shields.io/badge/Java-17-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://openjdk.org/projects/jdk/17/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.6-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
-[![MySQL](https://img.shields.io/badge/MySQL-8.x-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-336791?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Thymeleaf](https://img.shields.io/badge/Thymeleaf-3.x-005F0F?style=for-the-badge&logo=thymeleaf&logoColor=white)](https://www.thymeleaf.org/)
 [![License](https://img.shields.io/badge/License-MIT-pink?style=for-the-badge)](LICENSE)
 
@@ -128,7 +128,7 @@
 └──────────────┬───────────────────────────────────────────┘
                │
 ┌──────────────▼───────────────────────────────────────────┐
-│                      MySQL 8.x                           │
+│                    PostgreSQL 16                         │
 │   users · child_profiles · feeding_logs                  │
 │   feeding_alarms · health_records                        │
 └──────────────────────────────────────────────────────────┘
@@ -141,34 +141,34 @@
 ```sql
 -- Core user account
 users
-  id            BIGINT PK AUTO_INCREMENT
+  id            BIGSERIAL PK
   email         VARCHAR UNIQUE NOT NULL
   password      VARCHAR NOT NULL          -- BCrypt hashed
   phone_number  VARCHAR
 
 -- One user → many children
 child_profiles
-  id                    BIGINT PK
+  id                    BIGSERIAL PK
   user_id               BIGINT FK → users.id
   name                  VARCHAR
   age_months            INT
-  weight_kg             DOUBLE
+  weight_kg             DOUBLE PRECISION
   gender                VARCHAR
   country_region        VARCHAR
   privacy_shield_enabled BOOLEAN
 
 -- Feeding events
 feeding_logs
-  id          BIGINT PK
+  id          BIGSERIAL PK
   child_id    BIGINT FK → child_profiles.id
-  amount_ml   DOUBLE
+  amount_ml   DOUBLE PRECISION
   type        VARCHAR          -- Formula / Breast Milk / Water
-  timestamp   DATETIME
+  timestamp   TIMESTAMP
   note        VARCHAR
 
 -- Scheduled reminders
 feeding_alarms
-  id          BIGINT PK
+  id          BIGSERIAL PK
   child_id    BIGINT FK → child_profiles.id
   alarm_time  TIME
   label       VARCHAR
@@ -176,13 +176,13 @@ feeding_alarms
 
 -- Health measurements
 health_records
-  id                 BIGINT PK
+  id                 BIGSERIAL PK
   child_id           BIGINT FK → child_profiles.id
-  hemoglobin_level   DOUBLE
+  hemoglobin_level   DOUBLE PRECISION
   hemoglobin_status  VARCHAR    -- HEALTHY / ANEMIC / HIGH
-  weight_kg          DOUBLE
+  weight_kg          DOUBLE PRECISION
   allergens          VARCHAR
-  recorded_at        DATETIME
+  recorded_at        TIMESTAMP
 ```
 
 ---
@@ -202,11 +202,11 @@ health_records
 
 ### Prerequisites
 
-| Tool     | Version |
-| -------- | ------- |
-| Java JDK | 17+     |
-| Maven    | 3.8+    |
-| MySQL    | 8.x     |
+| Tool       | Version |
+| ---------- | ------- |
+| Java JDK   | 17+     |
+| Maven      | 3.8+    |
+| PostgreSQL | 13+     |
 
 ### 1. Clone the repository
 
@@ -215,7 +215,7 @@ git clone https://github.com/your-username/InfantMilkCare.git
 cd InfantMilkCare
 ```
 
-### 2. Create the MySQL database
+### 2. Create the PostgreSQL database
 
 ```sql
 CREATE DATABASE infant_milk_care;
@@ -223,12 +223,12 @@ CREATE DATABASE infant_milk_care;
 
 ### 3. Configure credentials
 
-Open `src/main/resources/application.properties` and update:
+Open `src/main/resources/application.properties` and set these env vars (or edit the defaults directly):
 
 ```properties
-spring.datasource.url=jdbc:mysql://localhost:3306/infant_milk_care
-spring.datasource.username=YOUR_MYSQL_USERNAME
-spring.datasource.password=YOUR_MYSQL_PASSWORD
+spring.datasource.url=jdbc:postgresql://localhost:5432/infant_milk_care
+spring.datasource.username=postgres
+spring.datasource.password=YOUR_POSTGRES_PASSWORD
 ```
 
 ### 4. Run the application
@@ -255,7 +255,7 @@ http://localhost:8081
 
 ## ☁️ Deploy to Render
 
-> **Why PostgreSQL on Render?** Render's managed databases only support PostgreSQL (not MySQL). The app ships with both drivers — PostgreSQL is used in production, MySQL is used locally.
+> **Why Render?** Render's managed PostgreSQL is free, auto-provisioned, and wired to the app via `render.yaml` — no manual credential setup needed.
 
 ### Step 1 — Push to GitHub
 
@@ -271,44 +271,23 @@ git push -u origin main
 
 Sign up at [render.com](https://render.com) (free tier available).
 
-### Step 3 — New Web Service (Docker)
+### Step 3 — Deploy via Blueprint
 
-1. Click **New → Web Service**
+1. Click **New → Blueprint**
 2. Connect your GitHub account and select the **InfantMilkCare** repository
-3. Render will detect the `Dockerfile` automatically
-4. Set **Name** → `infantmilkcare`, **Plan** → `Free`
+3. Render detects `render.yaml` and automatically creates:
+   - A **Web Service** (Docker) named `infantmilkcare`
+   - A **PostgreSQL database** named `infantmilkcare-db`
+4. Click **Apply**
 
-### Step 4 — Create a PostgreSQL Database
+Render auto-wires `DB_URL`, `DB_USERNAME`, and `DB_PASSWORD` from the managed database — **no manual credential setup needed**.
 
-1. Click **New → PostgreSQL**
-2. Set **Name** → `infantmilkcare-db`, **Plan** → `Free`
-3. After creation, open the database and copy the **Internal Database URL**
-   - It looks like: `postgres://user:pass@host:5432/dbname`
+### Step 4 — Done
 
-### Step 5 — Set Environment Variables
-
-In your web service → **Environment** tab, add these variables:
-
-| Key                 | Value                                                                        |
-| ------------------- | ---------------------------------------------------------------------------- |
-| `DB_HOST`           | Internal hostname from Render DB (e.g. `dpg-xxx.oregon-postgres.render.com`) |
-| `DB_PORT`           | `5432`                                                                       |
-| `DB_NAME`           | Your database name (shown in Render DB dashboard)                            |
-| `DB_USERNAME`       | Your database user (shown in Render DB dashboard)                            |
-| `DB_PASSWORD`       | Your database password (shown in Render DB dashboard)                        |
-| `DB_DRIVER`         | `org.postgresql.Driver`                                                      |
-| `HIBERNATE_DIALECT` | `org.hibernate.dialect.PostgreSQLDialect`                                    |
-| `SHOW_SQL`          | `false`                                                                      |
-
-> 💡 All these values are available in the Render PostgreSQL dashboard under **Connections**.
-
-### Step 6 — Deploy
-
-Click **Manual Deploy → Deploy latest commit**. Render will:
-
+Render will:
 1. Pull your code from GitHub
 2. Build the Docker image (Maven → JAR → Alpine JRE)
-3. Run `start.sh` which constructs `DB_URL` and starts Spring Boot
+3. Start Spring Boot with the auto-injected database credentials
 4. Auto-create all tables via `ddl-auto=update`
 
 Your app will be live at `https://infantmilkcare.onrender.com` 🎉
@@ -323,18 +302,18 @@ All configuration lives in `src/main/resources/application.properties`:
 
 ```properties
 # Server
-server.port=8081
+server.port=${PORT:8081}
 
-# MySQL
-spring.datasource.url=jdbc:mysql://localhost:3306/infant_milk_care
-spring.datasource.username=root
-spring.datasource.password=your_password
-spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+# PostgreSQL
+spring.datasource.url=${DB_URL:jdbc:postgresql://localhost:5432/infant_milk_care}
+spring.datasource.username=${DB_USERNAME:postgres}
+spring.datasource.password=${DB_PASSWORD:postgres}
+spring.datasource.driver-class-name=org.postgresql.Driver
 
 # JPA / Hibernate
-spring.jpa.hibernate.ddl-auto=update       # use 'validate' in production
-spring.jpa.show-sql=true                   # set false in production
-spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=${SHOW_SQL:true}
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
 spring.jpa.open-in-view=true
 ```
 
@@ -443,7 +422,7 @@ InfantMilkCare/
 | **Web MVC**     | Spring Web MVC + Thymeleaf                                            |
 | **Security**    | Spring Security 6 (BCrypt, Form Login)                                |
 | **ORM**         | Spring Data JPA + Hibernate                                           |
-| **Database**    | MySQL 8.x                                                             |
+| **Database**    | PostgreSQL 16                                                         |
 | **Build**       | Maven (Maven Wrapper included)                                        |
 | **Boilerplate** | Lombok (`@Getter`, `@Setter`, `@Builder`, `@RequiredArgsConstructor`) |
 | **UI**          | Vanilla CSS, Glassmorphism, Font Awesome 6, Google Fonts              |
