@@ -1,0 +1,23 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# IDE / OS files
+.idea
+*.iml
+.DS_Store
+Thumbs.db
+
+# Maven build output (don't copy into Docker build context)
+target/
+
+# Logs
+*.log
+
+# Environment files — never bake secrets into the image
+.env
+.env.*
+
+# Documentation
+README.md

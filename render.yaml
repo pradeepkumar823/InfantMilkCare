@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: infantmilkcare
+    runtime: docker
+    plan: free
+    healthCheckPath: /
+    envVars:
+      - key: DB_URL
+        fromDatabase:
+          name: infantmilkcare-db
+          property: connectionString
+      - key: DB_USERNAME
+        fromDatabase:
+          name: infantmilkcare-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: infantmilkcare-db
+          property: password
+      - key: SHOW_SQL
+        value: "false"
+
+databases:
+  - name: infantmilkcare-db
+    databaseName: infant_milk_care
+    plan: free

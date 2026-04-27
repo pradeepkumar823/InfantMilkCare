@@ -14,7 +14,7 @@
 
 <br/>
 
-> *"Because every drop matters."* — A smart companion for parents tracking their infant's milk intake, health stats, and feeding alarms in one beautiful dashboard.
+> _"Because every drop matters."_ — A smart companion for parents tracking their infant's milk intake, health stats, and feeding alarms in one beautiful dashboard.
 
 <br/>
 
@@ -30,6 +30,7 @@
 - [🗄️ Database Schema](#️-database-schema)
 - [🔐 Security](#-security)
 - [🚀 Getting Started](#-getting-started)
+- [☁️ Deploy to Render](#️-deploy-to-render)
 - [⚙️ Configuration](#️-configuration)
 - [📡 API Endpoints](#-api-endpoints)
 - [📁 Project Structure](#-project-structure)
@@ -41,21 +42,25 @@
 ## ✨ Features
 
 ### 🏠 Smart Dashboard
+
 - Real-time overview of your baby's **hemoglobin levels**, **weight**, and **age**
 - Color-coded health status badges (`HEALTHY` / `ANEMIC` / `OVERWEIGHT` / `UNDERWEIGHT`)
 - Quick-access forms to **log a new feed** and **record health stats** without leaving the dashboard
 
 ### 🍼 Feeding Log
+
 - Track every feed with **amount (mL)**, **type** (Formula / Breast Milk / Water), **timestamp**, and **notes**
 - Chronological feed history with delete support
 - Per-child feed isolation — switching children instantly filters data
 
 ### 🔔 Feeding Alarms
+
 - Schedule precise feeding reminders with a **custom label** and **time (HH:mm)**
 - View all active alarms in a clean card list
 - Delete individual alarms with one click
 
 ### 📊 Health Records
+
 - Record **hemoglobin levels (g/dL)** and **weight (kg)** over time
 - Automated status determination:
   - Hemoglobin: `< 11.0` → ANEMIC · `11–14` → HEALTHY · `> 14.0` → HIGH
@@ -63,16 +68,19 @@
 - Full history view sorted by most recent
 
 ### 🔬 Formula Scanner
+
 - Simulate scanning an infant formula product for allergens and BIS compliance
 - Instant **Safe / Allergen Detected** result with detailed message
 - 70% safe / 30% alert probability simulation (ready for real barcode integration)
 
 ### 👤 Profile Management
+
 - Update **phone number** and **password** with confirmation validation
 - Edit **child profile**: name, age, weight, gender, region
 - **Privacy Shield** — masks child's name with initials across the UI
 
 ### 👶 Multi-Child Support
+
 - Register **multiple child profiles** under one account
 - Switch active child via a persistent dropdown in the navbar — all pages update instantly
 - Session-based child selection with ownership validation
@@ -83,8 +91,8 @@
 
 > Pages included: Landing · Login · Register · Child Setup · Dashboard · History · Alarms · Profile · Scanner
 
-| Dashboard | Alarms | Health History |
-|-----------|--------|----------------|
+| Dashboard                                     | Alarms                              | Health History                        |
+| --------------------------------------------- | ----------------------------------- | ------------------------------------- |
 | Real-time stats, feed logger, health recorder | Schedule & manage feeding reminders | Full feeding & health record timeline |
 
 ---
@@ -194,11 +202,11 @@ health_records
 
 ### Prerequisites
 
-| Tool | Version |
-|------|---------|
-| Java JDK | 17+ |
-| Maven | 3.8+ |
-| MySQL | 8.x |
+| Tool     | Version |
+| -------- | ------- |
+| Java JDK | 17+     |
+| Maven    | 3.8+    |
+| MySQL    | 8.x     |
 
 ### 1. Clone the repository
 
@@ -245,6 +253,70 @@ http://localhost:8081
 
 ---
 
+## ☁️ Deploy to Render
+
+> **Why PostgreSQL on Render?** Render's managed databases only support PostgreSQL (not MySQL). The app ships with both drivers — PostgreSQL is used in production, MySQL is used locally.
+
+### Step 1 — Push to GitHub
+
+```bash
+git init            # if not already a git repo
+git add .
+git commit -m "Initial commit — ready for Render deployment"
+git remote add origin https://github.com/YOUR_USERNAME/InfantMilkCare.git
+git push -u origin main
+```
+
+### Step 2 — Create a Render account
+
+Sign up at [render.com](https://render.com) (free tier available).
+
+### Step 3 — New Web Service (Docker)
+
+1. Click **New → Web Service**
+2. Connect your GitHub account and select the **InfantMilkCare** repository
+3. Render will detect the `Dockerfile` automatically
+4. Set **Name** → `infantmilkcare`, **Plan** → `Free`
+
+### Step 4 — Create a PostgreSQL Database
+
+1. Click **New → PostgreSQL**
+2. Set **Name** → `infantmilkcare-db`, **Plan** → `Free`
+3. After creation, open the database and copy the **Internal Database URL**
+   - It looks like: `postgres://user:pass@host:5432/dbname`
+
+### Step 5 — Set Environment Variables
+
+In your web service → **Environment** tab, add these variables:
+
+| Key                 | Value                                                                        |
+| ------------------- | ---------------------------------------------------------------------------- |
+| `DB_HOST`           | Internal hostname from Render DB (e.g. `dpg-xxx.oregon-postgres.render.com`) |
+| `DB_PORT`           | `5432`                                                                       |
+| `DB_NAME`           | Your database name (shown in Render DB dashboard)                            |
+| `DB_USERNAME`       | Your database user (shown in Render DB dashboard)                            |
+| `DB_PASSWORD`       | Your database password (shown in Render DB dashboard)                        |
+| `DB_DRIVER`         | `org.postgresql.Driver`                                                      |
+| `HIBERNATE_DIALECT` | `org.hibernate.dialect.PostgreSQLDialect`                                    |
+| `SHOW_SQL`          | `false`                                                                      |
+
+> 💡 All these values are available in the Render PostgreSQL dashboard under **Connections**.
+
+### Step 6 — Deploy
+
+Click **Manual Deploy → Deploy latest commit**. Render will:
+
+1. Pull your code from GitHub
+2. Build the Docker image (Maven → JAR → Alpine JRE)
+3. Run `start.sh` which constructs `DB_URL` and starts Spring Boot
+4. Auto-create all tables via `ddl-auto=update`
+
+Your app will be live at `https://infantmilkcare.onrender.com` 🎉
+
+> ⚠️ **Free tier cold starts** — free Render services spin down after 15 minutes of inactivity. The first request after sleep takes ~30–60 seconds. Upgrade to **Starter** ($7/month) for always-on.
+
+---
+
 ## ⚙️ Configuration
 
 All configuration lives in `src/main/resources/application.properties`:
@@ -272,35 +344,35 @@ spring.jpa.open-in-view=true
 
 ### 🌐 Web Pages (GET)
 
-| Route | Description | Auth |
-|-------|-------------|------|
-| `GET /` | Landing page | ❌ |
-| `GET /login` | Login page | ❌ |
-| `GET /register` | Registration page | ❌ |
-| `GET /dashboard` | Main dashboard | ✅ |
-| `GET /alarms` | Feeding alarms | ✅ |
-| `GET /history` | Feed & health history | ✅ |
-| `GET /scanner` | Formula scanner | ✅ |
-| `GET /profile` | User & child profile | ✅ |
-| `GET /child-details` | Add child onboarding | ✅ |
+| Route                | Description           | Auth |
+| -------------------- | --------------------- | ---- |
+| `GET /`              | Landing page          | ❌   |
+| `GET /login`         | Login page            | ❌   |
+| `GET /register`      | Registration page     | ❌   |
+| `GET /dashboard`     | Main dashboard        | ✅   |
+| `GET /alarms`        | Feeding alarms        | ✅   |
+| `GET /history`       | Feed & health history | ✅   |
+| `GET /scanner`       | Formula scanner       | ✅   |
+| `GET /profile`       | User & child profile  | ✅   |
+| `GET /child-details` | Add child onboarding  | ✅   |
 
 ### 🔧 Action Endpoints (POST)
 
-| Route | Description | Auth |
-|-------|-------------|------|
-| `POST /api/onboarding/register` | Register new user | ❌ |
-| `POST /api/onboarding/child-details` | Save child profile | ✅ |
-| `POST /api/feeding/logs` | Log a new feed | ✅ |
-| `POST /api/feeding/logs/{id}/delete` | Delete a feed log | ✅ |
-| `POST /api/feeding/alarms` | Add a feeding alarm | ✅ |
-| `POST /api/feeding/alarms/{id}/delete` | Delete a feeding alarm | ✅ |
-| `POST /api/health/record` | Record health stats | ✅ |
-| `POST /api/profile/update-user` | Update account info | ✅ |
-| `POST /api/profile/update-child` | Update child profile | ✅ |
-| `POST /scanner/scan` | Run formula scan | ✅ |
-| `POST /switch-child` | Switch active child | ✅ |
-| `POST /login` | Authenticate user | ❌ |
-| `GET /logout` | Log out | ✅ |
+| Route                                  | Description            | Auth |
+| -------------------------------------- | ---------------------- | ---- |
+| `POST /api/onboarding/register`        | Register new user      | ❌   |
+| `POST /api/onboarding/child-details`   | Save child profile     | ✅   |
+| `POST /api/feeding/logs`               | Log a new feed         | ✅   |
+| `POST /api/feeding/logs/{id}/delete`   | Delete a feed log      | ✅   |
+| `POST /api/feeding/alarms`             | Add a feeding alarm    | ✅   |
+| `POST /api/feeding/alarms/{id}/delete` | Delete a feeding alarm | ✅   |
+| `POST /api/health/record`              | Record health stats    | ✅   |
+| `POST /api/profile/update-user`        | Update account info    | ✅   |
+| `POST /api/profile/update-child`       | Update child profile   | ✅   |
+| `POST /scanner/scan`                   | Run formula scan       | ✅   |
+| `POST /switch-child`                   | Switch active child    | ✅   |
+| `POST /login`                          | Authenticate user      | ❌   |
+| `GET /logout`                          | Log out                | ✅   |
 
 ---
 
@@ -364,36 +436,38 @@ InfantMilkCare/
 
 ## 🛠️ Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| **Language** | Java 17 |
-| **Framework** | Spring Boot 4.0.6 |
-| **Web MVC** | Spring Web MVC + Thymeleaf |
-| **Security** | Spring Security 6 (BCrypt, Form Login) |
-| **ORM** | Spring Data JPA + Hibernate |
-| **Database** | MySQL 8.x |
-| **Build** | Maven (Maven Wrapper included) |
+| Layer           | Technology                                                            |
+| --------------- | --------------------------------------------------------------------- |
+| **Language**    | Java 17                                                               |
+| **Framework**   | Spring Boot 4.0.6                                                     |
+| **Web MVC**     | Spring Web MVC + Thymeleaf                                            |
+| **Security**    | Spring Security 6 (BCrypt, Form Login)                                |
+| **ORM**         | Spring Data JPA + Hibernate                                           |
+| **Database**    | MySQL 8.x                                                             |
+| **Build**       | Maven (Maven Wrapper included)                                        |
 | **Boilerplate** | Lombok (`@Getter`, `@Setter`, `@Builder`, `@RequiredArgsConstructor`) |
-| **UI** | Vanilla CSS, Glassmorphism, Font Awesome 6, Google Fonts |
-| **Templating** | Thymeleaf 3 with `#temporals` (Java 8 Time API) |
+| **UI**          | Vanilla CSS, Glassmorphism, Font Awesome 6, Google Fonts              |
+| **Templating**  | Thymeleaf 3 with `#temporals` (Java 8 Time API)                       |
 
 ---
 
 ## 🩺 Health Status Logic
 
 ### Hemoglobin (g/dL)
-| Range | Status |
-|-------|--------|
-| `< 11.0` | 🔴 ANEMIC |
+
+| Range         | Status     |
+| ------------- | ---------- |
+| `< 11.0`      | 🔴 ANEMIC  |
 | `11.0 – 14.0` | 🟢 HEALTHY |
-| `> 14.0` | 🟡 HIGH |
+| `> 14.0`      | 🟡 HIGH    |
 
 ### Weight (kg) — Age 0–12 months
-| Range | Status |
-|-------|--------|
-| `< 7.0 kg` | 🟡 UNDERWEIGHT |
-| `7.0 – 12.0 kg` | 🟢 OPTIMAL |
-| `> 12.0 kg` | 🔴 OVERWEIGHT |
+
+| Range           | Status         |
+| --------------- | -------------- |
+| `< 7.0 kg`      | 🟡 UNDERWEIGHT |
+| `7.0 – 12.0 kg` | 🟢 OPTIMAL     |
+| `> 12.0 kg`     | 🔴 OVERWEIGHT  |
 
 ---
 
@@ -433,6 +507,6 @@ This project is licensed under the **MIT License** — see the [LICENSE](LICENSE
 
 Made with ❤️ for parents everywhere.
 
-**InfantMilkCare** — *Precision care for your little one.*
+**InfantMilkCare** — _Precision care for your little one._
 
 </div>
